@@ -54,6 +54,9 @@ steps:
 
     echo $RESULT | jq .
   displayName: 'Run Databricks Notebook'
+  env:
+    DATABRICKS_TOKEN: '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'
+    DATABRICKS_HOST: $(databricks_host)
 
 - task: PublishPipelineArtifact@1
   inputs:
@@ -66,7 +69,3 @@ steps:
     pathToPublish: '$(Build.ArtifactStagingDirectory)'
     artifactName: 'databricks-notebook-artifact'
   condition: always
-
-env:
-  DATABRICKS_TOKEN: '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'
-  DATABRICKS_HOST: $(databricks_host)
