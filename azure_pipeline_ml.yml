@@ -8,7 +8,7 @@ variables:
   databricks-host: 'https://adb-4188668828067310.10.azuredatabricks.net'
   notebook-folder: '/Users/tushar.pathak@tigeranalytics.com/'
   cluster-id: '0708-064558-lglz5exu'
-  notebook-name: 'Deepchecks_Model_Testing_v1'
+  notebook-name: 'Deepchecks_Model_Testing_v2'
 
 steps:
 - task: UsePythonVersion@0
@@ -81,6 +81,20 @@ steps:
 
     echo "$RESULT" | jq .
   displayName: 'Run Databricks Notebook'
+
+- task: JakubRumpca.azure-pipelines-html-report.PublishHtmlReport.PublishHtmlReport@1
+  displayName: 'Publish HTML Report'
+  condition: always()
+  inputs:
+    reportDir: '$(System.DefaultWorkingDirectory)/Reports'
+
+- task: PublishPipelineArtifact@1
+  displayName: 'Publish HTML Report to artifact'
+  condition: always()
+  inputs:
+    targetPath: '$(System.DefaultWorkingDirectory)/Reports'
+    artifact: 'ML HTML Report'
+
 
   env:
     DATABRICKS_TOKEN: 'dapi1062f3ecc6b393a6c5934704162792b4-3'
