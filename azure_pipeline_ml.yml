@@ -10,9 +10,7 @@ variables:
   cluster-id: '0708-064558-lglz5exu'
   notebook-name: 'Deepchecks_Model_Testing_v1'
   html-report-paths: |
-    /Workspace/Users/tushar.pathak@tigeranalytics.com/Reports/Data_Integrity_Report.html
-    /Workspace/Users/tushar.pathak@tigeranalytics.com/Reports/Test_Train_Validation_Report.html
-    /Workspace/Users/tushar.pathak@tigeranalytics.com/Reports/Monitor_Evaluation.html
+    /Workspace/Users/tushar.pathak@tigeranalytics.com/Reports/
   local-html-report-path: '$(Build.ArtifactStagingDirectory)/Reports'
 
 steps:
@@ -98,11 +96,10 @@ steps:
     # Download the HTML reports from Databricks workspace to local path
     IFS=$'\n'
     for report_path in $html-report-paths; do
-        report_name=$(basename "$report_path")  # Removed the problematic -r option
+        report_name=$(basename "$report_path")
         databricks workspace export "$report_path" "$(local-html-report-path)/$report_name"
     done
   displayName: 'Download HTML reports'
-
 
 - task: PublishPipelineArtifact@1
   inputs:
