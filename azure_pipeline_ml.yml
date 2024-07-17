@@ -47,7 +47,6 @@ jobs:
       RUN_ID=$(databricks jobs run-now --job-id $JOB_ID | jq -r '.run_id')
 
       echo "Waiting for notebook execution to complete..."
-      databricks runs wait --run-id $RUN_ID
 
       # Check run result
       RESULT=$(databricks runs get-output --run-id $RUN_ID)
