@@ -97,11 +97,12 @@ steps:
 
     # Download the HTML reports from Databricks workspace to local path
     IFS=$'\n'
-    for report_path in $(html-report-paths); do
+    for report_path in $html-report-paths; do  # Removed double quotes around $html-report-paths
         report_name=$(basename "$report_path")
         databricks workspace export "$report_path" "$(local-html-report-path)/$report_name"
     done
   displayName: 'Download HTML reports'
+
 
 - task: PublishPipelineArtifact@1
   inputs:
