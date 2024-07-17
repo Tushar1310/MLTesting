@@ -6,7 +6,7 @@ variables:
   notebook_folder: '/Users/tushar.pathak@tigeranalytics.com/'
   cluster_id: '0708-064558-lglz5exu'
   notebook_name: 'Deepchecks_Model_Testing_v2'
-  DATABRICKS_TOKEN: $(secret_databricks_token)  # Replace with your secret variable name in Azure DevOps
+  DATABRICKS_TOKEN: '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'  # Replace with your secret variable name in Azure DevOps
 
 jobs:
 - job: Run_Databricks_Notebook
