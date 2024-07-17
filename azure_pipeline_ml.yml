@@ -12,7 +12,7 @@ variables:
   html-report-workspace-path-data-integrity: '/Workspace/Users/tushar.pathak@tigeranalytics.com/Reports/Data_Integrity_Report.html'
   local-html-report-path-1: '$(Build.ArtifactStagingDirectory)/Data_Integrity_Report.html'
   html-report-workspace-path-train: '/Workspace/Users/tushar.pathak@tigeranalytics.com/Reports/Test_Train_Validation_Report.html'
-  local-html-report-path-2: '$(Build.ArtifactStagingDirectory)/Data_Integrity_Report.html'
+  local-html-report-path-2: '$(Build.ArtifactStagingDirectory)/Test_Train_Validation_Report.html'
 
 steps:
 - task: UsePythonVersion@0
@@ -91,6 +91,14 @@ steps:
     DATABRICKS_HOST: $(databricks-host)
 
 - script: |
+    # Remove existing files if they exist
+    if [ -f "$(local-html-report-path-1)" ]; then
+        rm "$(local-html-report-path-1)"
+    fi
+    if [ -f "$(local-html-report-path-2)" ]; then
+        rm "$(local-html-report-path-2)"
+    fi
+
     # Download the HTML report from Databricks workspace to local path
     databricks workspace export $(html-report-workspace-path-data-integrity) $(local-html-report-path-1)
     databricks workspace export $(html-report-workspace-path-train) $(local-html-report-path-2)
@@ -101,7 +109,7 @@ steps:
     targetPath: '$(local-html-report-path-1)'
     artifact: 'HTMLReport-DI'
   displayName: 'Publish Data Integrity Report'
-  
+
 - task: PublishPipelineArtifact@1
   inputs:
     targetPath: '$(local-html-report-path-2)'
