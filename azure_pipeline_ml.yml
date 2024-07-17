@@ -35,11 +35,11 @@ jobs:
 
       JOB_ID=$(databricks jobs create --json '{
        "name": "Testrun",
-       "existing_cluster_id": "'$cluster_id'",
+       "existing_cluster_id": "$cluster_id",
        "timeout_seconds": 3600,
        "max_retries": 1,
        "notebook_task": {
-         "notebook_path": "'$notebook_folder$notebook_name'",
+         "notebook_path": "$notebook_folder$notebook_name",
          "base_parameters": {}
        }
       }' | jq -r '.job_id')
