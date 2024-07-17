@@ -9,8 +9,11 @@ variables:
   notebook-folder: '/Users/tushar.pathak@tigeranalytics.com/'
   cluster-id: '0708-064558-lglz5exu'
   notebook-name: 'Deepchecks_Model_Testing_v1'
-  html-report-workspace-path: '/Workspace/Users/tushar.pathak@tigeranalytics.com/Reports/Data_Integrity_Report.html'
-  local-html-report-path: '$(Build.ArtifactStagingDirectory)/Data_Integrity_Report.html'
+  html-report-paths: |
+    /Workspace/Users/tushar.pathak@tigeranalytics.com/Reports/Data_Integrity_Report.html
+    /Workspace/Users/tushar.pathak@tigeranalytics.com/Reports/Test_Train_Validation_Report.html
+    /Workspace/Users/tushar.pathak@tigeranalytics.com/Reports/Monitor_Evaluation.html
+  local-html-report-path: '$(Build.ArtifactStagingDirectory)/Reports'
 
 steps:
 - task: UsePythonVersion@0
@@ -89,12 +92,19 @@ steps:
     DATABRICKS_HOST: $(databricks-host)
 
 - script: |
-    # Download the HTML report from Databricks workspace to local path
-    databricks workspace export $(html-report-workspace-path) $(local-html-report-path)
-  displayName: 'Download HTML report'
+    # Create local report directory
+    mkdir -p $(local-html-report-path)
+
+    # Download the HTML reports from Databricks workspace to local path
+    IFS=$'\n'
+    for report_path in $(html-report-paths); do
+        report_name=$(basename $report_path)
+        databricks workspace export $report_path $(local-html-report-path)/$report_name
+    done
+  displayName: 'Download HTML reports'
 
 - task: PublishPipelineArtifact@1
   inputs:
     targetPath: '$(local-html-report-path)'
-    artifact: 'HTMLReport'
-  displayName: 'Publish HTML Report'
+    artifact: 'HTMLReports'
+  displayName: 'Publish HTML Reports'
