@@ -13,6 +13,8 @@ variables:
   local-html-report-path-1: '$(Build.ArtifactStagingDirectory)/Data_Integrity_Report.html'
   html-report-workspace-path-train: '/Workspace/Users/tushar.pathak@tigeranalytics.com/Reports/Test_Train_Validation_Report.html'
   local-html-report-path-2: '$(Build.ArtifactStagingDirectory)/Test_Train_Validation_Report.html'
+  html-report-workspace-path-Monitor-eval: "/Workspace/Users/tushar.pathak@tigeranalytics.com/Reports/Monitor_Evaluation.html"
+  local-html-report-path-3: '$(Build.ArtifactStagingDirectory)/Monitor_Evaluation.html'
 
 steps:
 - task: UsePythonVersion@0
@@ -98,20 +100,30 @@ steps:
     if [ -f "$(local-html-report-path-2)" ]; then
         rm "$(local-html-report-path-2)"
     fi
-
+    if [ -f "$(local-html-report-path-3)" ]; then
+        rm "$(local-html-report-path-3)"
+    fi
+    
     # Download the HTML report from Databricks workspace to local path
     databricks workspace export $(html-report-workspace-path-data-integrity) $(local-html-report-path-1)
     databricks workspace export $(html-report-workspace-path-train) $(local-html-report-path-2)
+    databricks workspace export $(html-report-workspace-path-Monitor-eval) $(local-html-report-path-3)
   displayName: 'Download HTML report'
 
 - task: PublishPipelineArtifact@1
   inputs:
     targetPath: '$(local-html-report-path-1)'
-    artifact: 'HTMLReport-DI'
+    artifact: 'HTMLReport-Data_Integrity'
   displayName: 'Publish Data Integrity Report'
 
 - task: PublishPipelineArtifact@1
   inputs:
     targetPath: '$(local-html-report-path-2)'
-    artifact: 'HTMLReport-TTV'
+    artifact: 'HTMLReport-Test_Validation'
   displayName: 'Publish Test Train Report'
+
+- task: PublishPipelineArtifact@1
+  inputs:
+    targetPath: '$(local-html-report-path-3)'
+    artifact: 'HTMLReport-Monitor_Eval'
+  displayName: 'Publish Monitor Evaluation Report'
