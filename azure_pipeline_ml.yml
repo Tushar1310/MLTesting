@@ -81,20 +81,21 @@ steps:
 
     echo "$RESULT" | jq .
   displayName: 'Run Databricks Notebook'
+  
+- task: JakubRumpca.azure-pipelines-html-report.PublishHtmlReport.PublishHtmlReport@1
+  displayName: 'Publish HTML Report'
+  condition: always()
+  inputs:
+    reportDir: '$(System.DefaultWorkingDirectory)/Reports'
+
+- task: PublishPipelineArtifact@1
+  displayName: 'Publish HTML Report to artifact'
+  condition: always()
+  inputs:
+    targetPath: '$(System.DefaultWorkingDirectory)/Reports'
+    artifact: 'ML HTML Report'
+
 
   env:
     DATABRICKS_TOKEN: 'dapi1062f3ecc6b393a6c5934704162792b4-3'
     DATABRICKS_HOST: $(databricks-host)
-  
-    - task: JakubRumpca.azure-pipelines-html-report.PublishHtmlReport.PublishHtmlReport@1
-      displayName: 'Publish HTML Report'
-      condition: always()
-      inputs:
-        reportDir: '$(System.DefaultWorkingDirectory)/Reports'
-
-    - task: PublishPipelineArtifact@1
-      displayName: 'Publish HTML Report to artifact'
-      condition: always()
-      inputs:
-        targetPath: '$(System.DefaultWorkingDirectory)/Reports'
-        artifact: 'ML HTML Report'
