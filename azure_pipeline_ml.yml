@@ -9,66 +9,66 @@ variables:
   DATABRICKS_TOKEN: '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'  # Replace with your secret variable name in Azure DevOps
 
 jobs:
-- job: Run_Databricks_Notebook
-  displayName: 'Run Databricks Notebook'
-  pool:
-    vmImage: 'ubuntu-latest'
-  
-  steps:
-  - task: UsePythonVersion@0
-    displayName: 'Use Python 3.x'
-    inputs:
-      versionSpec: '3.x'
-      addToPath: true
-
-  - script: |
-      pip install databricks-cli
-    displayName: 'Install databricks-cli'
-
-  - script: |
-      # Install jq
-      sudo apt-get update
-      sudo apt-get install -y jq
-
-      export DATABRICKS_TOKEN='$(DATABRICKS_TOKEN)'
-      export DATABRICKS_HOST='$(databricks_host)'
-
-      JOB_ID=$(databricks jobs create --json '{
-       "name": "Testrun",
-       "existing_cluster_id": "$cluster_id",
-       "timeout_seconds": 3600,
-       "max_retries": 1,
-       "notebook_task": {
-         "notebook_path": "$notebook_folder$notebook_name",
-         "base_parameters": {}
-       }
-      }' | jq -r '.job_id')
-
-      RUN_ID=$(databricks jobs run-now --job-id $JOB_ID | jq -r '.run_id')
-
-      echo "Waiting for notebook execution to complete..."
-
-      # Check run result
-      RESULT=$(databricks runs get-output --run-id $RUN_ID)
-      RESULT_STATE=$(echo $RESULT | jq -r '.metadata.state.result_state')
-      if [[ "$RESULT_STATE" == "FAILED" ]]
-      then
-        echo "Notebook execution failed."
-        exit 1
-      else
-        echo "Notebook executed successfully."
-      fi
-
+  - job: Run_Databricks_Notebook
     displayName: 'Run Databricks Notebook'
+    pool:
+      vmImage: 'ubuntu-latest'
+  
+    steps:
+      - task: UsePythonVersion@0
+        displayName: 'Use Python 3.x'
+        inputs:
+          versionSpec: '3.x'
+          addToPath: true
 
-  - task: PublishPipelineArtifact@1
-    inputs:
-      targetPath: '$(Build.ArtifactStagingDirectory)'
-      artifact: 'reports'
-    condition: always()
+      - script: |
+          pip install databricks-cli
+        displayName: 'Install databricks-cli'
 
-  - task: PublishBuildArtifacts@1
-    inputs:
-      pathToPublish: '$(Build.ArtifactStagingDirectory)'
-      artifactName: 'databricks-notebook-artifact'
-    condition: always()
+      - script: |
+          # Install jq
+          sudo apt-get update
+          sudo apt-get install -y jq
+
+          export DATABRICKS_TOKEN="${{ variables.DATABRICKS_TOKEN }}"
+          export DATABRICKS_HOST="${{ variables.databricks_host }}"
+
+          JOB_ID=$(databricks jobs create --json '{
+           "name": "Testrun",
+           "existing_cluster_id": "'"${{ variables.cluster_id }}"'",
+           "timeout_seconds": 3600,
+           "max_retries": 1,
+           "notebook_task": {
+             "notebook_path": "'"${{ variables.notebook_folder }}${{ variables.notebook_name }}"'",
+             "base_parameters": {}
+           }
+          }' | jq -r '.job_id')
+
+          RUN_ID=$(databricks jobs run-now --job-id $JOB_ID | jq -r '.run_id')
+
+          echo "Waiting for notebook execution to complete..."
+
+          # Check run result
+          RESULT=$(databricks runs get-output --run-id $RUN_ID)
+          RESULT_STATE=$(echo $RESULT | jq -r '.metadata.state.result_state')
+          if [[ "$RESULT_STATE" == "FAILED" ]]
+          then
+            echo "Notebook execution failed."
+            exit 1
+          else
+            echo "Notebook executed successfully."
+          fi
+
+        displayName: 'Run Databricks Notebook'
+
+      - task: PublishPipelineArtifact@1
+        inputs:
+          targetPath: '$(Build.ArtifactStagingDirectory)'
+          artifact: 'reports'
+        condition: always()
+
+      - task: PublishBuildArtifacts@1
+        inputs:
+          pathToPublish: '$(Build.ArtifactStagingDirectory)'
+          artifactName: 'databricks-notebook-artifact'
+        condition: always()
