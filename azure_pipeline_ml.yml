@@ -8,7 +8,7 @@ variables:
   databricks-host: 'https://adb-4188668828067310.10.azuredatabricks.net'
   notebook-folder: '/Users/tushar.pathak@tigeranalytics.com/'
   cluster-id: '0708-064558-lglz5exu'
-  notebook-name: 'Deepchecks_Model_Testing_v1'
+  notebook-name: 'Deepchecks_Model_Testing_v2'
 
 steps:
 - task: UsePythonVersion@0
@@ -81,7 +81,19 @@ steps:
 
     echo "$RESULT" | jq .
   displayName: 'Run Databricks Notebook'
+  
+- task: PublishPipelineArtifact@1
+  inputs:
+    targetPath: '$(Build.ArtifactStagingDirectory)/Reports'
+    artifact: 'reports'
+  condition: always()
 
+- task: PublishBuildArtifacts@1
+  inputs:
+    pathToPublish: '$(Build.ArtifactStagingDirectory)'
+    artifactName: 'databricks-notebook-artifact'
+  condition: always()
+  
   env:
     DATABRICKS_TOKEN: 'dapi1062f3ecc6b393a6c5934704162792b4-3'
     DATABRICKS_HOST: $(databricks-host)
