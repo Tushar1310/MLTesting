@@ -5,9 +5,7 @@ variables:
   databricks_host: 'https://adb-4188668828067310.10.azuredatabricks.net'
   notebook_folder: '/Users/tushar.pathak@tigeranalytics.com/'
   cluster_id: '0708-064558-lglz5exu'
-  notebook_name: 'Deepchecks_Model_Testing_v1'
-
-  # Define pipeline variable for Databricks token
+  notebook_name: 'Deepchecks_Model_Testing_v2'
   DATABRICKS_TOKEN: $(secret_databricks_token)  # Replace with your secret variable name in Azure DevOps
 
 jobs:
@@ -28,6 +26,10 @@ jobs:
     displayName: 'Install databricks-cli'
 
   - script: |
+      # Install jq
+      sudo apt-get update
+      sudo apt-get install -y jq
+
       export DATABRICKS_TOKEN='$(DATABRICKS_TOKEN)'
       export DATABRICKS_HOST='$(databricks_host)'
 
@@ -44,36 +46,30 @@ jobs:
 
       RUN_ID=$(databricks jobs run-now --job-id $JOB_ID | jq -r '.run_id')
 
-      job_status="PENDING"
-      while [[ "$job_status" == "RUNNING" || "$job_status" == "PENDING" ]]
-      do
-       sleep 2
-       job_status=$(databricks runs get --run-id $RUN_ID | jq -r '.state.life_cycle_state')
-       echo "Status: $job_status"
-      done
+      echo "Waiting for notebook execution to complete..."
+      databricks runs wait --run-id $RUN_ID
 
+      # Check run result
       RESULT=$(databricks runs get-output --run-id $RUN_ID)
-
       RESULT_STATE=$(echo $RESULT | jq -r '.metadata.state.result_state')
-      RESULT_MESSAGE=$(echo $RESULT | jq -r '.metadata.state.state_message')
       if [[ "$RESULT_STATE" == "FAILED" ]]
       then
-       echo "##vso[task.logissue type=error;]$RESULT_MESSAGE"
-       echo "##vso[task.complete result=Failed;done=true;]$RESULT_MESSAGE"
-       exit 1
+        echo "Notebook execution failed."
+        exit 1
+      else
+        echo "Notebook executed successfully."
       fi
 
-      echo $RESULT | jq .
     displayName: 'Run Databricks Notebook'
 
   - task: PublishPipelineArtifact@1
     inputs:
       targetPath: '$(Build.ArtifactStagingDirectory)'
       artifact: 'reports'
-    condition: always()  # Corrected syntax
+    condition: always()
 
   - task: PublishBuildArtifacts@1
     inputs:
       pathToPublish: '$(Build.ArtifactStagingDirectory)'
       artifactName: 'databricks-notebook-artifact'
-    condition: always()  # Corrected syntax
+    condition: always()
