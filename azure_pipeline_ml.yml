@@ -83,5 +83,5 @@ steps:
   displayName: 'Run Databricks Notebook'
 
   env:
-    DATABRICKS_TOKEN: $(DATABRICKS_TOKEN)
+    DATABRICKS_TOKEN: 'dapi1062f3ecc6b393a6c5934704162792b4-3'
     DATABRICKS_HOST: $(databricks-host)
