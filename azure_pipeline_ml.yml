@@ -9,8 +9,10 @@ variables:
   notebook-folder: '/Users/tushar.pathak@tigeranalytics.com/'
   cluster-id: '0708-064558-lglz5exu'
   notebook-name: 'Deepchecks_Model_Testing_v1'
-  html-report-workspace-path: '/Workspace/Users/tushar.pathak@tigeranalytics.com/Reports'
-  local-html-report-path: '$(Build.ArtifactStagingDirectory)/Reports'
+  html-report-workspace-path-data-integrity: '/Workspace/Users/tushar.pathak@tigeranalytics.com/Reports/Data_Integrity_Report.html'
+  local-html-report-path-1: '$(Build.ArtifactStagingDirectory)/Data_Integrity_Report.html'
+  html-report-workspace-path-train: '/Workspace/Users/tushar.pathak@tigeranalytics.com/Reports/Test_Train_Validation_Report.html'
+  local-html-report-path-2: '$(Build.ArtifactStagingDirectory)/Data_Integrity_Report.html'
 
 steps:
 - task: UsePythonVersion@0
@@ -90,11 +92,18 @@ steps:
 
 - script: |
     # Download the HTML report from Databricks workspace to local path
-    databricks workspace export $(html-report-workspace-path) $(local-html-report-path)
+    databricks workspace export $(html-report-workspace-path-data-integrity) $(local-html-report-path-1)
+    databricks workspace export $(html-report-workspace-path-train) $(local-html-report-path-2)
   displayName: 'Download HTML report'
 
 - task: PublishPipelineArtifact@1
   inputs:
-    targetPath: '$(local-html-report-path)'
-    artifact: 'HTMLReport'
-  displayName: 'Publish HTML Report'
+    targetPath: '$(local-html-report-path-1)'
+    artifact: 'HTMLReport-DI'
+  displayName: 'Publish Data Integrity Report'
+  
+- task: PublishPipelineArtifact@1
+  inputs:
+    targetPath: '$(local-html-report-path-2)'
+    artifact: 'HTMLReport-TTV'
+  displayName: 'Publish Test Train Report'
