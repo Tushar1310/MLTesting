@@ -91,18 +91,13 @@ steps:
 
 - script: |
     # Create local report directory
-    mkdir -p "$(local-html-report-path)"
-
-    # Download the HTML reports from Databricks workspace to local path
-    IFS=$'\n'
-    for report_path in $html-report-paths; do
-        report_name=$(basename "$report_path")
-        databricks workspace export "$report_path" "$(local-html-report-path)/$report_name"
-    done
+    databricks fs cp --recursive dbfs:/Workspace/Users/tushar.pathak@tigeranalytics.com/Reports ./Reports
+    
   displayName: 'Download HTML reports'
 
-- task: PublishPipelineArtifact@1
+- task: PublishBuildArtifacts@1
   inputs:
-    targetPath: '$(local-html-report-path)'
-    artifact: 'HTMLReports'
-  displayName: 'Publish HTML Reports'
+    pathtoPublish: './Reports'
+    artifactName: 'DatabricksReports'
+    publishLocation: 'Container'
+  displayName: 'Publish Databricks Reports as Artifact'
