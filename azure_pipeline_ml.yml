@@ -9,8 +9,7 @@ variables:
   notebook-folder: '/Users/tushar.pathak@tigeranalytics.com/'
   cluster-id: '0708-064558-lglz5exu'
   notebook-name: 'Deepchecks_Model_Testing_v1'
-  html-report-paths: |
-    /Workspace/Users/tushar.pathak@tigeranalytics.com/Reports/
+  html-report-workspace-path: '/Workspace/Users/tushar.pathak@tigeranalytics.com/Reports'
   local-html-report-path: '$(Build.ArtifactStagingDirectory)/Reports'
 
 steps:
@@ -90,14 +89,12 @@ steps:
     DATABRICKS_HOST: $(databricks-host)
 
 - script: |
-    # Create local report directory
-    databricks fs cp --recursive dbfs:/Workspace/Users/tushar.pathak@tigeranalytics.com/Reports ./Reports
-    
-  displayName: 'Download HTML reports'
+    # Download the HTML report from Databricks workspace to local path
+    databricks workspace export $(html-report-workspace-path) $(local-html-report-path)
+  displayName: 'Download HTML report'
 
-- task: PublishBuildArtifacts@1
+- task: PublishPipelineArtifact@1
   inputs:
-    pathtoPublish: './Reports'
-    artifactName: 'DatabricksReports'
-    publishLocation: 'Container'
-  displayName: 'Publish Databricks Reports as Artifact'
+    targetPath: '$(local-html-report-path)'
+    artifact: 'HTMLReport'
+  displayName: 'Publish HTML Report'
