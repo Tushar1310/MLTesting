@@ -32,6 +32,24 @@ steps:
     # Configure Databricks CLI
     databricks jobs configure --version=2.1
 
+    # Create an archive directory with a timestamp
+    TIMESTAMP=$(date +%Y%m%d%H%M%S)
+    ARCHIVE_DIR="/Workspace/Users/tushar.pathak@tigeranalytics.com/Reports/Archive_$TIMESTAMP"
+
+    # Create the archive directory
+    databricks workspace mkdirs $ARCHIVE_DIR
+
+    # Move existing reports to the archive directory
+    databricks workspace mv /Workspace/Users/tushar.pathak@tigeranalytics.com/Reports/Data_Integrity_Report.html $ARCHIVE_DIR/Data_Integrity_Report.html
+    databricks workspace mv /Workspace/Users/tushar.pathak@tigeranalytics.com/Reports/Test_Train_Validation_Report.html $ARCHIVE_DIR/Test_Train_Validation_Report.html
+    databricks workspace mv /Workspace/Users/tushar.pathak@tigeranalytics.com/Reports/Monitor_Evaluation.html $ARCHIVE_DIR/Monitor_Evaluation.html
+  displayName: 'Archive existing reports'
+
+  env:
+    DATABRICKS_TOKEN: 'dapi1062f3ecc6b393a6c5934704162792b4-3'
+    DATABRICKS_HOST: $(databricks-host)
+
+- script: |
     # Create a new job and capture the Job ID
     JOB_ID=$(databricks jobs create --json '{
      "name": "Testrun",
