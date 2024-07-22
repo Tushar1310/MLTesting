@@ -1,3 +1,4 @@
+
 resources:
   - repo: self
 
@@ -39,10 +40,20 @@ steps:
     # Create the archive directory
     databricks workspace mkdirs $ARCHIVE_DIR
 
-    # Move existing reports to the archive directory
-    databricks workspace mv /Workspace/Users/tushar.pathak@tigeranalytics.com/Reports/Data_Integrity_Report.html $ARCHIVE_DIR/Data_Integrity_Report.html
-    databricks workspace mv /Workspace/Users/tushar.pathak@tigeranalytics.com/Reports/Test_Train_Validation_Report.html $ARCHIVE_DIR/Test_Train_Validation_Report.html
-    databricks workspace mv /Workspace/Users/tushar.pathak@tigeranalytics.com/Reports/Monitor_Evaluation.html $ARCHIVE_DIR/Monitor_Evaluation.html
+    # Export existing reports to local paths
+    databricks workspace export $(html-report-workspace-path-data-integrity) $(local-html-report-path-1)
+    databricks workspace export $(html-report-workspace-path-train) $(local-html-report-path-2)
+    databricks workspace export $(html-report-workspace-path-Monitor-eval) $(local-html-report-path-3)
+
+    # Import the reports to the archive directory
+    databricks workspace import --overwrite $(local-html-report-path-1) $ARCHIVE_DIR/Data_Integrity_Report.html
+    databricks workspace import --overwrite $(local-html-report-path-2) $ARCHIVE_DIR/Test_Train_Validation_Report.html
+    databricks workspace import --overwrite $(local-html-report-path-3) $ARCHIVE_DIR/Monitor_Evaluation.html
+
+    # Remove the original reports
+    databricks workspace rm $(html-report-workspace-path-data-integrity)
+    databricks workspace rm $(html-report-workspace-path-train)
+    databricks workspace rm $(html-report-workspace-path-Monitor-eval)
   displayName: 'Archive existing reports'
 
   env:
