@@ -10,11 +10,8 @@ variables:
   cluster-id: '0708-064558-lglz5exu'
   notebook-name: 'Deepchecks_Model_Testing_v1'
   html-report-workspace-path-data-integrity: '/Workspace/Users/tushar.pathak@tigeranalytics.com/Reports/Data_Integrity_Report.html'
-  local-html-report-path-1: '$(Build.ArtifactStagingDirectory)/Data_Integrity_Report.html'
   html-report-workspace-path-train: '/Workspace/Users/tushar.pathak@tigeranalytics.com/Reports/Test_Train_Validation_Report.html'
-  local-html-report-path-2: '$(Build.ArtifactStagingDirectory)/Test_Train_Validation_Report.html'
-  html-report-workspace-path-Monitor-eval: "/Workspace/Users/tushar.pathak@tigeranalytics.com/Reports/Monitor_Evaluation.html"
-  local-html-report-path-3: '$(Build.ArtifactStagingDirectory)/Monitor_Evaluation.html'
+  html-report-workspace-path-Monitor-eval: '/Workspace/Users/tushar.pathak@tigeranalytics.com/Reports/Monitor_Evaluation.html'
 
 steps:
 - task: UsePythonVersion@0
@@ -25,35 +22,18 @@ steps:
   displayName: 'Use Python 3.x'
 
 - script: |
-    pip install databricks-cli jq
+    pip install --upgrade databricks-cli jq
   displayName: 'Install databricks-cli and jq'
 
 - script: |
     # Configure Databricks CLI
     databricks jobs configure --version=2.1
 
-    # Create an archive directory with a timestamp
-    TIMESTAMP=$(date +%Y%m%d%H%M%S)
-    ARCHIVE_DIR="/Workspace/Users/tushar.pathak@tigeranalytics.com/Reports/Archive_$TIMESTAMP"
-
-    # Create the archive directory
-    databricks workspace mkdirs $ARCHIVE_DIR
-
-    # Export existing reports to local paths
-    databricks workspace export $(html-report-workspace-path-data-integrity) $(local-html-report-path-1)
-    databricks workspace export $(html-report-workspace-path-train) $(local-html-report-path-2)
-    databricks workspace export $(html-report-workspace-path-Monitor-eval) $(local-html-report-path-3)
-
-    # Import the reports to the archive directory
-    databricks workspace import --format HTML --overwrite $(local-html-report-path-1) $ARCHIVE_DIR/Data_Integrity_Report.html
-    databricks workspace import --format HTML --overwrite $(local-html-report-path-2) $ARCHIVE_DIR/Test_Train_Validation_Report.html
-    databricks workspace import --format HTML --overwrite $(local-html-report-path-3) $ARCHIVE_DIR/Monitor_Evaluation.html
-
-    # Remove the original reports
+    # Delete existing reports
     databricks workspace rm $(html-report-workspace-path-data-integrity)
     databricks workspace rm $(html-report-workspace-path-train)
     databricks workspace rm $(html-report-workspace-path-Monitor-eval)
-  displayName: 'Archive existing reports'
+  displayName: 'Delete existing reports'
 
   env:
     DATABRICKS_TOKEN: 'dapi1062f3ecc6b393a6c5934704162792b4-3'
@@ -155,4 +135,3 @@ steps:
     targetPath: '$(local-html-report-path-3)'
     artifact: 'HTMLReport-Monitor_Eval'
   displayName: 'Publish Monitor Evaluation Report'
-#End
