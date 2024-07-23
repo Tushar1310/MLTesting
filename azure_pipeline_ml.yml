@@ -1,4 +1,3 @@
-
 resources:
   - repo: self
 
@@ -46,9 +45,9 @@ steps:
     databricks workspace export $(html-report-workspace-path-Monitor-eval) $(local-html-report-path-3)
 
     # Import the reports to the archive directory
-    databricks workspace import --overwrite $(local-html-report-path-1) $ARCHIVE_DIR/Data_Integrity_Report.html
-    databricks workspace import --overwrite $(local-html-report-path-2) $ARCHIVE_DIR/Test_Train_Validation_Report.html
-    databricks workspace import --overwrite $(local-html-report-path-3) $ARCHIVE_DIR/Monitor_Evaluation.html
+    databricks workspace import --format HTML --overwrite $(local-html-report-path-1) $ARCHIVE_DIR/Data_Integrity_Report.html
+    databricks workspace import --format HTML --overwrite $(local-html-report-path-2) $ARCHIVE_DIR/Test_Train_Validation_Report.html
+    databricks workspace import --format HTML --overwrite $(local-html-report-path-3) $ARCHIVE_DIR/Monitor_Evaluation.html
 
     # Remove the original reports
     databricks workspace rm $(html-report-workspace-path-data-integrity)
