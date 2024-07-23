@@ -12,6 +12,9 @@ variables:
   html-report-workspace-path-data-integrity: '/Workspace/Users/tushar.pathak@tigeranalytics.com/Reports/Data_Integrity_Report.html'
   html-report-workspace-path-train: '/Workspace/Users/tushar.pathak@tigeranalytics.com/Reports/Test_Train_Validation_Report.html'
   html-report-workspace-path-Monitor-eval: '/Workspace/Users/tushar.pathak@tigeranalytics.com/Reports/Monitor_Evaluation.html'
+  local-html-report-path-1: '$(Build.ArtifactStagingDirectory)/Data_Integrity_Report.html'
+  local-html-report-path-2: '$(Build.ArtifactStagingDirectory)/Test_Train_Validation_Report.html'
+  local-html-report-path-3: '$(Build.ArtifactStagingDirectory)/Monitor_Evaluation.html'
 
 steps:
 - task: UsePythonVersion@0
