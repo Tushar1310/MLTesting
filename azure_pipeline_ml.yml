@@ -139,17 +139,29 @@ steps:
     artifact: 'HTMLReport-Monitor_Eval'
   displayName: 'Publish Monitor Evaluation Report'
 
+
+- task: JakubRumpca.azure-pipelines-html-report.PublishHtmlReport.PublishHtmlReport@1
+  displayName: 'Publish HTML Report 1'
+  condition: always()
+  inputs:
+    reportDir: '$(local-html-report-path-1)'
+    reportTitle: 'Data_Integrity_Report'
+    reportName: 'Data_Integrity_Report'
+
 - task: JakubRumpca.azure-pipelines-html-report.PublishHtmlReport.PublishHtmlReport@1
   displayName: 'Publish HTML Report 2'
   condition: always()
   inputs:
     reportDir: '$(local-html-report-path-2)'
     reportTitle: 'Test Train Report'
-
+    reportName: 'Test Train Report'
+    
 - task: JakubRumpca.azure-pipelines-html-report.PublishHtmlReport.PublishHtmlReport@1
   displayName: 'Publish HTML Report 3'
   condition: always()
   inputs:
     reportDir: '$(local-html-report-path-3)'
     reportTitle: 'Monitor Evaluation Report'
+    reportName: 'Monitor Evaluation Report'
+
   #End
